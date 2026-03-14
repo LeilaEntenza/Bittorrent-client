@@ -1,7 +1,7 @@
 'use strict';
 
 const dgram = require('dgram');
-const buffer = require('buffer').Buffer;
+const Buffer = require('buffer').Buffer;
 const urlParse = require('url').parse;
 
 module.exports.getPeers = (torrent, callback) => {
@@ -32,12 +32,22 @@ const respType = (resp) => {
 
 }
 
+const crypto = require('crypto')
 const buildConnReq = () => {
-
+    const buf = Buffer.alloc(16);
+    buf.writeUint32BE(0x417, 0);
+    buf.writeUInt32BE(0x27101980, 4);
+    buf.writeUint32BE(0, 8);
+    crypto.randomBytes(4).copy(buf, 12);    
+    return buf;
 }
 
 const parseConnResp = (resp) => {
-
+    return{
+        action: resp.readUint32BE(0),
+        transactionId: resp.readUint32BE(4),
+        connectionId: resp.readUint32BE(8)
+    }
 }
 
 const buildAnnounceReq = (connId) => {
@@ -45,5 +55,5 @@ const buildAnnounceReq = (connId) => {
 }
 
 const parseAnnounceResp = (resp) => {
-    
+
 }
